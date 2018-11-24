@@ -1,0 +1,56 @@
+<html>
+
+  <head>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+  </head>
+
+  <body>
+
+    <div class="currentQuery">
+      State Code: {{ state_code }}
+      Number of Hits: {{ number_of_hits }}
+
+      <a class="github-logo" href="https://github.com/TheBatmanofButler/ThirstyMap">
+        <img src="{{ url_for('static', filename='github.png') }}">
+      </a>
+      
+    </div>
+
+    <div class="inputForm">
+      <form action="." method="POST">
+        <input type="text" name="stateCode" value="NY">
+        <input type="text" name="numberOfHits" value="50">
+        <input type="submit" name="submitButton">
+      </form>
+    </div>
+
+    <div>
+
+      <table>
+        <tr>
+          <th>Site Code</th>
+          <th>Site Name</th>
+          <th>Lat</th>
+          <th>Lon</th>
+          <th>Image</th>
+        </tr>
+        {% for key, value in data.iteritems() %}
+          <tr>
+            <td>{{ key }}</td>
+            <td>{{ value["name"] }}</td>
+            <td>{{ value["lat"] }}</td>
+            <td>{{ value["lon"] }}</td>
+            <td>
+              <img class="image" src="{{ value['image_url'] }}">
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+
+    </div>
+
+  </body>
+
+</html>
