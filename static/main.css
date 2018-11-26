@@ -1,15 +1,50 @@
 body, html {
-	background-color: #fff;
+  background-color: #000;
+  color: #fff;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th {
+  background: green;
+  height: 40px;
+  text-align: left;
 }
 
 .image {
-	height: 120px;
+  height: 120px;
 }
 
-.github-logo {
-	float: right;
+.current-query {
+  float: left;
 }
 
-.github-logo>img:hover {
-	opacity: 0.5;
+.input-form {
+  float: right;
+}
+
+.results {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.result-row {
+  background: #000;
+  border-bottom: #fff 1px solid;
+}
+
+.selected {
+  background: red;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }
