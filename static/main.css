@@ -1,38 +1,45 @@
 body, html {
-  background-color: #000;
+  margin: 0;
+  padding: 0;
+
+  background-color: #262626;
   color: #fff;
 }
 
-table {
-  border-collapse: collapse;
+h1 {
+  font-size: 400%;
 }
 
-th {
-  background: green;
-  height: 40px;
-  text-align: left;
+.main-container {
+  display: flex;
 }
 
-.image {
-  height: 120px;
+.number-container-wrapper {
+  display: flex;
+  min-height: 50%;
 }
 
-.current-query {
-  float: left;
+.button-container-wrapper {
+  flex: 1;
+  /* background: red; */
 }
 
-.input-form {
-  float: right;
+.site-name {
+  text-align: center;
 }
 
-.results {
-  width: 100%;
-  border-collapse: collapse;
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-.result-row {
-  background: #000;
-  border-bottom: #fff 1px solid;
+.right-panel {
+  min-width: 50%;
+}
+
+#image {
+  height: 100vh;
 }
 
 .selected {
@@ -47,4 +54,46 @@ th {
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
+}
+
+.button {
+  width: 46%;
+  float: left;
+  margin: 2%;
+
+  cursor: pointer;
+  text-align: center;
+
+  background: #255c99;
+}
+
+.button:hover {
+  opacity: 0.8;
+}
+
+#yes-button {
+  background: #69b578;
+}
+
+#no-button {
+  background: #b3001b;
+}
+
+.heading-container {
+  clear: both;
+}
+
+.heading-container h5 {
+  float: left;
+}
+
+.heading-container h4 {
+  float: right;
+}
+
+.number-container {
+  flex: 1;
+  width: 46%;
+  float: left;
+  margin: 2%;
 }
