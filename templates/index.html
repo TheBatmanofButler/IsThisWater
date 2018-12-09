@@ -3,11 +3,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
     <script>
-      let lat = {{ lat|tojson }},
-          lon = {{ lon|tojson }},
-          zoom = {{ zoom|tojson }},
-          num_images_labeled = {{ num_images_labeled|tojson }},
-          MAPBOX_ACCESS_TOKEN = {{ MAPBOX_ACCESS_TOKEN|tojson }}
+      let num_images_labeled = {{ num_images_labeled|tojson }},
+          image_filepath = {{ image_filepath|tojson }},
+          zoom = {{ zoom|tojson }};
     </script>
   </head>
 
@@ -47,7 +45,7 @@
       </div>
 
       <div class="right-panel">
-        <img id="image" src="https://api.mapbox.com/v4/mapbox.satellite/{{ lon }},{{ lat }},{{ zoom }}/1000x1000.png32?access_token={{ MAPBOX_ACCESS_TOKEN }}">
+        <img id="image" src="{{ image_filepath }}">
       </div>
 
     </div>

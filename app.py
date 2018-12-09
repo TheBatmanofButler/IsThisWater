@@ -1,68 +1,56 @@
 from flask import Flask, render_template, request, url_for, redirect, jsonify
+from images_api import ImagesManager
 
 import os
 import json
+import random
 
 app = Flask(__name__)
 
-MAPBOX_ACCESS_TOKEN = os.environ['MAPBOX_ACCESS_TOKEN']
-STANDARD_ZOOM = 15
-filepath = 'sites.json'
-
-with open(filepath) as fp:
-    sites_dict = json.load(fp)
+images_manager = ImagesManager()
 
 
 @app.route('/', methods=['GET'])
 def index():
-    site = sites_dict['unchecked'][0]
-    lat = site.get('lat')
-    lon = site.get('lon')
-    num_images_labeled = len(sites_dict['water_found']) + len(sites_dict['water_not_found'])
-
-    print_image_log(site)
+    num_images_labeled = images_manager.get_num_images_labeled()
+    image_filepath = images_manager.get_current_image_filepath()
+    zoom = images_manager.get_current_zoom()
 
     return render_template('index.html',
-                            num_images_labeled=num_images_labeled,
-                            lat=lat,
-                            lon=lon,
-                            zoom=STANDARD_ZOOM,
-                            MAPBOX_ACCESS_TOKEN=MAPBOX_ACCESS_TOKEN)
+                           image_filepath=image_filepath,
+                           zoom=zoom,
+                           num_images_labeled=num_images_labeled)
+
+
+@app.route('/update_zoom', methods=['POST'])
+def update_zoom():
+    zoom = int(request.json)
+    images_manager.update_image(zoom)
+    image_filepath_og = images_manager.get_current_image_filepath()
+
+    random_num = random.randint(1e6, 1e7 - 1)
+    image_filepaths_rand = '{}?dummy={}'.format(image_filepath_og, random_num)
+
+    return jsonify(image_filepaths_rand)
 
 
 @app.route('/load_next_image', methods=['POST'])
 def load_next_image():
-    water_found, zoom = request.json
+    water_found = request.json
 
-    site = sites_dict['unchecked'].pop(0)
-    site['zoom'] = zoom
-    
-    if water_found:
-        sites_dict['water_found'].append(site)
-    else:
-        sites_dict['water_not_found'].append(site)
-    
-    with open(filepath, 'w+') as fp:
-        json.dump(sites_dict, fp)
+    images_manager.next_image(water_found)
 
-    if not len(sites_dict['unchecked']):
+    if not images_manager._unchecked_sites:
         return jsonify(None)
 
-    site = sites_dict['unchecked'][0]
-    lat = site['lat']
-    lon = site['lon']
-    zoom = STANDARD_ZOOM
-    num_images_labeled = len(sites_dict['water_found']) + len(sites_dict['water_not_found'])
-    print_image_log(site)
+    image_filepath = images_manager.get_current_image_filepath()
+    zoom = images_manager.get_current_zoom()
+    num_images_labeled = images_manager.get_num_images_labeled()
 
-    return jsonify([lat, lon, zoom, num_images_labeled])
-
-
-def print_image_log(site):
-    print(site.get('name'), site.get('site_code'))
+    return jsonify([image_filepath, zoom, num_images_labeled])
 
 
 if __name__ == '__main__':
-    app.debug = False
+    app.debug = True
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)

@@ -1,45 +1,51 @@
-let $image = $('.right-panel img'),
+let onNextImageSuccess = function (response) {
+      if (!response) {
+        alert('All images checked.');
+        return;
+      }
 
-    getImageSrc = function () {
-      return 'https://api.mapbox.com/v4/mapbox.satellite/' + 
-            lon + ',' + lat + ',' + zoom + '/1000x1000.png32?access_token='
-            + MAPBOX_ACCESS_TOKEN
+      image_filepath = response[0];
+      zoom = response[1];
+      num_images_labeled = response[2];
+      updateZoom();
     },
 
-    updateZoom = function () {
+    onUpdateZoomSuccess = function (response) {
+      image_filepath = response;
+      
       $('#zoom-level').html(zoom);
       $('#num-images-labeled').html(num_images_labeled);
       $image.css('opacity', '0');
-      $image.attr('src', getImageSrc());
+      $image.attr('src', image_filepath);
       $image.on('load', null);
       $image.on('load', function () {
         $image.css('opacity', '1');
       });
-    },
 
-    submitLabel = function (label) {
+    },
+    
+    callImagesAPI = function (url, data, successCallback) {
       $.ajax({
-        url: '/load_next_image',
-        data: JSON.stringify([label, zoom]),
+        url: url,
+        data: JSON.stringify(data),
         type: 'POST',
         contentType: 'application/json',
-        success: function(response) {
-          if (!response) {
-            alert('All images checked.');
-            return;
-          }
-    
-          lat = response[0];
-          lon = response[1];
-          zoom = response[2];
-          num_images_labeled = response[3];
-          updateZoom();
-        },
+        success: successCallback,
         error: function(error) {
           console.log(error);
         }
       });
-    }
+    };
+
+let $image = $('.right-panel img'),
+
+    updateZoom = function () {
+      callImagesAPI('/update_zoom', zoom, onUpdateZoomSuccess);
+    },
+
+    loadNextImage = function (label) {
+      callImagesAPI('/load_next_image', [label, zoom], onNextImageSuccess);
+    };
 
 $('#zoom-in-button').click( function (e) {
   zoom++;
@@ -54,9 +60,9 @@ $('#zoom-out-button').click( function (e) {
 });
 
 $('#no-button').click( function (e) {
-  submitLabel(false);
+  loadNextImage(false);
 });
 
 $('#yes-button').click( function (e) {
-  submitLabel(true);
+  loadNextImage(true);
 });
