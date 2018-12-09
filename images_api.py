@@ -1,6 +1,7 @@
 import os
 import json
 import urllib
+import time
 
 
 class ImagesManager:
@@ -86,20 +87,23 @@ class ImagesManager:
         return image_filepath
 
     def delete_image(self):
+        t0 = time.time()
         image_filepath = self.get_current_image_filepath()
         os.remove(image_filepath)
+        print(time.time() - t0, 'delete')
 
     def download_image(self):
+        t0 = time.time()
         image_url = self.get_image_url()
         image_filepath = self.get_current_image_filepath()
         urllib.request.urlretrieve(image_url, image_filepath)
 
         self.print_image_log()
+        print(time.time() - t0, 'download')
 
     def get_image_url(self):
         lat = self._current_site.get('lat')
         lon = self._current_site.get('lon')
         zoom = self._current_site.get('zoom')
-        print(zoom)
 
         return 'https://api.mapbox.com/v4/mapbox.satellite/{},{},{}/1000x1000.png32?access_token={}'.format(lon, lat, zoom, self._MAPBOX_ACCESS_TOKEN)
