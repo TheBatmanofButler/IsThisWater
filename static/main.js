@@ -1,4 +1,12 @@
-let onNextImageSuccess = function (response) {
+let updateZoom = function (newZoom) {
+      callImagesAPI('/update_zoom', newZoom, onUpdateZoomSuccess);
+    },
+
+    loadNextImage = function (label) {
+      callImagesAPI('/load_next_image', label, onNextImageSuccess);
+    },
+
+    onNextImageSuccess = function (response) {
       if (!response) {
         alert('All images checked.');
         return;
@@ -7,22 +15,29 @@ let onNextImageSuccess = function (response) {
       image_filepath = response[0];
       zoom = response[1];
       num_images_labeled = response[2];
-      updateZoom();
+      
+      updateUI();
     },
 
     onUpdateZoomSuccess = function (response) {
-      image_filepath = response;
-      
+      image_filepath = response[0];
+      zoom = response[1]
+
+      updateUI();
+    },
+
+    updateUI = function () {
       $('#zoom-level').html(zoom);
       $('#num-images-labeled').html(num_images_labeled);
+
+      let $image = $('.right-panel img');
       $image.css('opacity', '0');
       $image.attr('src', image_filepath);
       $image.on('load', null);
       $image.on('load', function () {
         $image.css('opacity', '1');
       });
-
-    },
+    }
     
     callImagesAPI = function (url, data, successCallback) {
       $.ajax({
@@ -31,32 +46,28 @@ let onNextImageSuccess = function (response) {
         type: 'POST',
         contentType: 'application/json',
         success: successCallback,
-        error: function(error) {
-          console.log(error);
+        error: function(xhr, status, error) {
+          let responseObj = JSON.parse(xhr.responseText),
+              errorMessage = responseObj.message;
+
+          alert(errorMessage);
         }
       });
     };
 
-let $image = $('.right-panel img'),
-
-    updateZoom = function () {
-      callImagesAPI('/update_zoom', zoom, onUpdateZoomSuccess);
-    },
-
-    loadNextImage = function (label) {
-      callImagesAPI('/load_next_image', [label, zoom], onNextImageSuccess);
-    };
-
 $('#zoom-in-button').click( function (e) {
-  zoom++;
-  updateZoom();
+  let newZoom = zoom + 1;
+  updateZoom(newZoom);
 });
 
 $('#zoom-out-button').click( function (e) {
-  if (zoom == 0) return;
+  if (zoom == 0){
+    alert('Zoom cannot be negative.')
+    return;
+  }
 
-  zoom--;
-  updateZoom();
+  let newZoom = zoom - 1;
+  updateZoom(newZoom);
 });
 
 $('#no-button').click( function (e) {

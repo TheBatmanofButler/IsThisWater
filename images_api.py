@@ -2,15 +2,22 @@ import os
 import json
 import urllib
 import time
+import shutil
+
+from mapbox import Static
+
+MAPBOX_ACCESS_TOKEN = os.environ['MAPBOX_ACCESS_TOKEN']
+service = Static(access_token=MAPBOX_ACCESS_TOKEN)
 
 
 class ImagesManager:
 
     def __init__(self):
-        self._MAPBOX_ACCESS_TOKEN = os.environ['MAPBOX_ACCESS_TOKEN']
         self._STANDARD_ZOOM = 15
         self._STATIC_DIRECTORY = 'static/'
-        self._IMAGES_DIRECTORY = 'images/'
+        self._BASE_IMAGES_DIRECTORY = 'base_images/'
+        self._CURRENT_IMAGE_DIRECTORY = 'current_image/'
+        self._LABELED_IMAGES_DIRECTORY = 'labeled_images/'
         self._DATA_FILEPATH = 'sites.json'
 
         self._sites_dict = self.get_sites_dict()
@@ -42,8 +49,14 @@ class ImagesManager:
     def classify_site(self, water_found):
         if water_found:
             self._water_sites.append(self._current_site)
+            label = 'water'
         else:
             self._no_water_sites.append(self._current_site)
+            label = 'no_water'
+
+        current_image_filepath = self.get_current_image_filepath()
+        labeled_image_filepath = self.get_labeled_image_filepath(label)
+        shutil.copyfile(current_image_filepath, labeled_image_filepath)
 
         self._unchecked_sites.pop(0)
 
@@ -55,16 +68,19 @@ class ImagesManager:
 
         self._current_site['zoom'] = self._STANDARD_ZOOM
 
-        self.download_image()
+        self.load_image_from_base_dir()
 
     def next_image(self, water_found):
         self.classify_site(water_found)
         self.initialize_next_image()
 
     def update_image(self, zoom):
-        self.delete_image()
-        self._current_site['zoom'] = zoom
-        self.download_image()
+        download_status_code = self.download_image(zoom)
+
+        if download_status_code == 200:
+            self._current_site['zoom'] = zoom
+
+        return download_status_code
 
     def get_sites_dict(self):
         with open(self._DATA_FILEPATH) as fp:
@@ -73,18 +89,9 @@ class ImagesManager:
         return sites_dict
 
     def print_image_log(self):
-        print('Downloaded {} ({}.png)'.format(
-              self._current_site.get('name'),
-              self._current_site.get('site_code')))
-
-    def get_current_image_filepath(self):
-        site_code = self._current_site.get('site_code')
-        image_filename = '{}.png'.format(site_code)
-        image_filepath = os.path.join(self._STATIC_DIRECTORY,
-                                      self._IMAGES_DIRECTORY,
-                                      image_filename)
-
-        return image_filepath
+        print('Downloaded {}'.format(self._current_site.get('name')))
+        print('Zoom: {}'.format(self._current_site.get('zoom')))
+        print('{}.png'.format(self._current_site.get('site_code')))
 
     def delete_image(self):
         t0 = time.time()
@@ -92,18 +99,47 @@ class ImagesManager:
         os.remove(image_filepath)
         print(time.time() - t0, 'delete')
 
-    def download_image(self):
-        t0 = time.time()
-        image_url = self.get_image_url()
-        image_filepath = self.get_current_image_filepath()
-        urllib.request.urlretrieve(image_url, image_filepath)
+    def load_image_from_base_dir(self):
+        base_image_filepath = self.get_base_image_filepath()
+        current_image_filepath = self.get_current_image_filepath()
+        shutil.copyfile(base_image_filepath, current_image_filepath)
 
-        self.print_image_log()
-        print(time.time() - t0, 'download')
+    def get_base_image_filepath(self):
+        return self.get_image_filepath(self._BASE_IMAGES_DIRECTORY)
 
-    def get_image_url(self):
+    def get_current_image_filepath(self):
+        return self.get_image_filepath(self._CURRENT_IMAGE_DIRECTORY)
+
+    def get_labeled_image_filepath(self, label):
+        subdirectory = os.path.join(self._LABELED_IMAGES_DIRECTORY, label)
+        return self.get_image_filepath(subdirectory)
+
+    def get_image_filepath(self, subdirectory):
+        site_code = self._current_site.get('site_code')
+        image_filename = '{}.png'.format(site_code)
+        image_filepath = os.path.join(self._STATIC_DIRECTORY,
+                                      subdirectory,
+                                      image_filename)
+
+        return image_filepath
+
+    def download_image(self, zoom):
+        response = self.get_mapbox_api_response(zoom)
+
+        if response.status_code == 200:
+            image_filepath = self.get_current_image_filepath()
+
+            with open(image_filepath, 'wb') as output:
+                output.write(response.content)
+
+            self.print_image_log()
+
+        return response.status_code
+
+    def get_mapbox_api_response(self, zoom):
         lat = self._current_site.get('lat')
         lon = self._current_site.get('lon')
-        zoom = self._current_site.get('zoom')
 
-        return 'https://api.mapbox.com/v4/mapbox.satellite/{},{},{}/1000x1000.png32?access_token={}'.format(lon, lat, zoom, self._MAPBOX_ACCESS_TOKEN)
+        response = service.image('mapbox.satellite', lon=lon, lat=lat, z=zoom)
+
+        return response

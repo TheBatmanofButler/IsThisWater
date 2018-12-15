@@ -25,13 +25,26 @@ def index():
 @app.route('/update_zoom', methods=['POST'])
 def update_zoom():
     zoom = int(request.json)
-    images_manager.update_image(zoom)
-    image_filepath_og = images_manager.get_current_image_filepath()
+    download_status_code = images_manager.update_image(zoom)
 
-    random_num = random.randint(1e6, 1e7 - 1)
-    image_filepaths_rand = '{}?dummy={}'.format(image_filepath_og, random_num)
+    if download_status_code == 200:
 
-    return jsonify(image_filepaths_rand)
+        image_filepath_og = images_manager.get_current_image_filepath()
+
+        random_num = random.randint(1e6, 1e7 - 1)
+        image_filepaths_rand = '{}?dummy={}'.format(image_filepath_og, 
+                                                    random_num)
+
+        response = jsonify([image_filepaths_rand, zoom])
+
+    else:
+        response = jsonify({
+            'message': 'Download failed. Check logs for details.'
+        })
+
+    response.status_code = download_status_code
+
+    return response
 
 
 @app.route('/load_next_image', methods=['POST'])

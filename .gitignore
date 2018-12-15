@@ -1,4 +1,6 @@
 .ipynb_checkpoints/
 .vscode/
 __pycache__/
-static/images/
+static/base_images/
+static/current_images/
+static/labeled_images/
