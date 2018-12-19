@@ -2,5 +2,10 @@
 .vscode/
 __pycache__/
 static/base_images/
-static/current_images/
+static/current_image/
 static/labeled_images/
+model_data/test/test_images/
+model_data/train/no_water/
+model_data/train/water/
+model_data/val/no_water/
+model_data/val/water/

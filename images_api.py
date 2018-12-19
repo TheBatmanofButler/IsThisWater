@@ -19,6 +19,8 @@ class ImagesManager:
         self._CURRENT_IMAGE_DIRECTORY = 'current_image/'
         self._LABELED_IMAGES_DIRECTORY = 'labeled_images/'
         self._DATA_FILEPATH = 'sites.json'
+        self._IMAGE_WIDTH = 1000
+        self._IMAGE_HEIGHT = 1000
 
         self._sites_dict = self.get_sites_dict()
         self._unchecked_sites = self._sites_dict['unchecked']
@@ -43,7 +45,6 @@ class ImagesManager:
 
     def get_num_images_labeled(self):
         num_images_labeled = len(self._water_sites) + len(self._no_water_sites)
-
         return num_images_labeled
 
     def classify_site(self, water_found):
@@ -140,6 +141,11 @@ class ImagesManager:
         lat = self._current_site.get('lat')
         lon = self._current_site.get('lon')
 
-        response = service.image('mapbox.satellite', lon=lon, lat=lat, z=zoom)
+        response = service.image('mapbox.satellite',
+                                 lon=lon,
+                                 lat=lat,
+                                 z=zoom,
+                                 width=self._IMAGE_WIDTH,
+                                 height=self._IMAGE_HEIGHT)
 
         return response
