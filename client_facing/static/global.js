@@ -1,0 +1,2 @@
+let lat,
+    lng;
