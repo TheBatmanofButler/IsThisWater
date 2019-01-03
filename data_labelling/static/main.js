@@ -7,14 +7,13 @@ let updateZoom = function (newZoom) {
     },
 
     onNextImageSuccess = function (response) {
-      if (!response) {
-        alert('All images checked.');
-        return;
-      }
+      image_filepath = response['image_filepath'];
+      zoom = response['zoom'];
+      num_images_left = response['num_images_left'];
+      next_image_is_ready = response['next_image_is_ready']
 
-      image_filepath = response[0];
-      zoom = response[1];
-      num_images_labeled = response[2];
+      if (!next_image_is_ready)
+        $('.button').off();
       
       updateUI();
     },
@@ -28,7 +27,7 @@ let updateZoom = function (newZoom) {
 
     updateUI = function () {
       $('#zoom-level').html(zoom);
-      $('#num-images-labeled').html(num_images_labeled);
+      $('#num-images-left').html(num_images_left);
 
       let $image = $('.right-panel img');
       $image.css('opacity', '0');
@@ -37,6 +36,7 @@ let updateZoom = function (newZoom) {
       $image.on('load', function () {
         $image.css('opacity', '1');
       });
+      console.log(222);
     }
     
     callImagesAPI = function (url, data, successCallback) {
@@ -45,13 +45,7 @@ let updateZoom = function (newZoom) {
         data: JSON.stringify(data),
         type: 'POST',
         contentType: 'application/json',
-        success: successCallback,
-        error: function(xhr, status, error) {
-          let responseObj = JSON.parse(xhr.responseText),
-              errorMessage = responseObj.message;
-
-          alert(errorMessage);
-        }
+        success: successCallback
       });
     };
 
@@ -71,9 +65,13 @@ $('#zoom-out-button').click( function (e) {
 });
 
 $('#no-button').click( function (e) {
-  loadNextImage(false);
+  loadNextImage(0);
 });
 
 $('#yes-button').click( function (e) {
-  loadNextImage(true);
+  loadNextImage(1);
+});
+
+$('#ignore-button').click( function (e) {
+  loadNextImage(2);
 });

@@ -12,13 +12,13 @@ service = Static(access_token=MAPBOX_ACCESS_TOKEN)
 
 class ImagesManager:
 
-    def __init__(self):
+    def __init__(self, sites_data_filepath='json/sites_from_cities_0.json'):
         self._STANDARD_ZOOM = 15
         self._STATIC_DIRECTORY = 'static/'
         self._BASE_IMAGES_DIRECTORY = 'base_images/'
         self._CURRENT_IMAGE_DIRECTORY = 'current_image/'
         self._LABELED_IMAGES_DIRECTORY = 'labeled_images/'
-        self._DATA_FILEPATH = 'sites.json'
+        self._SITES_DATA_FILEPATH = sites_data_filepath
         self._IMAGE_WIDTH = 1000
         self._IMAGE_HEIGHT = 1000
 
@@ -28,63 +28,71 @@ class ImagesManager:
         self._no_water_sites = self._sites_dict['no_water']
 
         self._current_site = None
-        self.initialize_next_image()
+        next_image_is_ready = self.initialize_next_image()
+
+        if not next_image_is_ready:
+            raise Exception('No sites left.')
 
     def save_sites_dict(self):
         self._sites_dict = {
             'unchecked': self._unchecked_sites,
-            'water_found': self._water_sites,
-            'water_not_found': self._no_water_sites
+            'water': self._water_sites,
+            'no_water': self._no_water_sites
         }
 
-        with open(self._DATA_FILEPATH, 'w+') as fp:
+        with open(self._SITES_DATA_FILEPATH, 'w+') as fp:
             json.dump(self._sites_dict, fp)
 
     def get_current_zoom(self):
         return self._current_site.get('zoom')
 
-    def get_num_images_labeled(self):
-        num_images_labeled = len(self._water_sites) + len(self._no_water_sites)
-        return num_images_labeled
+    def get_num_images_left(self):
+        num_images_left = len(self._unchecked_sites)
+        return num_images_left
 
-    def classify_site(self, water_found):
-        if water_found:
-            self._water_sites.append(self._current_site)
-            label = 'water'
-        else:
-            self._no_water_sites.append(self._current_site)
-            label = 'no_water'
+    def classify_site(self, image_label):
+        if image_label < 2:
+            if image_label == 0:
+                self._no_water_sites.append(self._current_site)
+                label = 'no_water'
+            elif image_label == 1:
+                self._water_sites.append(self._current_site)
+                label = 'water'
 
-        current_image_filepath = self.get_current_image_filepath()
-        labeled_image_filepath = self.get_labeled_image_filepath(label)
-        shutil.copyfile(current_image_filepath, labeled_image_filepath)
+            current_image_filepath = self.get_current_image_filepath()
+            labeled_image_filepath = self.get_labeled_image_filepath(label)
+            shutil.copyfile(current_image_filepath, labeled_image_filepath)
 
         self._unchecked_sites.pop(0)
+        self.delete_current_image()
+        self.save_sites_dict()
 
     def initialize_next_image(self):
-        try:
+        if self._unchecked_sites:
             self._current_site = self._unchecked_sites[0]
-        except IndexError:
-            raise Exception('out of sites')
+            self._current_site['zoom'] = self._STANDARD_ZOOM
+            self.load_image_from_base_dir()
 
-        self._current_site['zoom'] = self._STANDARD_ZOOM
+            return True
 
-        self.load_image_from_base_dir()
+        return False
 
-    def next_image(self, water_found):
-        self.classify_site(water_found)
-        self.initialize_next_image()
+    def next_image(self, image_label):
+        self.classify_site(image_label)
+        next_image_is_ready = self.initialize_next_image()
+
+        return next_image_is_ready
 
     def update_image(self, zoom):
         download_status_code = self.download_image(zoom)
 
         if download_status_code == 200:
             self._current_site['zoom'] = zoom
-
+        
         return download_status_code
 
     def get_sites_dict(self):
-        with open(self._DATA_FILEPATH) as fp:
+        with open(self._SITES_DATA_FILEPATH) as fp:
             sites_dict = json.load(fp)
 
         return sites_dict
@@ -94,11 +102,9 @@ class ImagesManager:
         print('Zoom: {}'.format(self._current_site.get('zoom')))
         print('{}.png'.format(self._current_site.get('site_code')))
 
-    def delete_image(self):
-        t0 = time.time()
+    def delete_current_image(self):
         image_filepath = self.get_current_image_filepath()
         os.remove(image_filepath)
-        print(time.time() - t0, 'delete')
 
     def load_image_from_base_dir(self):
         base_image_filepath = self.get_base_image_filepath()

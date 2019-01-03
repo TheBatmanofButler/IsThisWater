@@ -12,14 +12,14 @@ images_manager = ImagesManager()
 
 @app.route('/', methods=['GET'])
 def index():
-    num_images_labeled = images_manager.get_num_images_labeled()
+    num_images_left = images_manager.get_num_images_left()
     image_filepath = images_manager.get_current_image_filepath()
     zoom = images_manager.get_current_zoom()
 
     return render_template('index.html',
                            image_filepath=image_filepath,
                            zoom=zoom,
-                           num_images_labeled=num_images_labeled)
+                           num_images_left=num_images_left)
 
 
 @app.route('/update_zoom', methods=['POST'])
@@ -29,13 +29,15 @@ def update_zoom():
 
     if download_status_code == 200:
 
-        image_filepath_og = images_manager.get_current_image_filepath()
-
+        image_filepath = images_manager.get_current_image_filepath()
         random_num = random.randint(1e6, 1e7 - 1)
-        image_filepaths_rand = '{}?dummy={}'.format(image_filepath_og, 
-                                                    random_num)
+        image_filepath_rand = '{}?dummy={}'.format(image_filepath,
+                                                   random_num)
 
-        response = jsonify([image_filepaths_rand, zoom])
+        response = jsonify({
+            'image_filepath': image_filepath_rand,
+            'zoom': zoom
+        })
 
     else:
         response = jsonify({
@@ -49,18 +51,26 @@ def update_zoom():
 
 @app.route('/load_next_image', methods=['POST'])
 def load_next_image():
-    water_found = request.json
+    image_label = request.json
+    next_image_is_ready = images_manager.next_image(image_label)
 
-    images_manager.next_image(water_found)
+    if next_image_is_ready:
+        image_filepath = images_manager.get_current_image_filepath()
+        zoom = images_manager.get_current_zoom()
+        num_images_left = images_manager.get_num_images_left()
+    else:
+        image_filepath = ''
+        zoom = None
+        num_images_left = 0
 
-    if not images_manager._unchecked_sites:
-        return jsonify(None)
+    response = jsonify({
+        'image_filepath': image_filepath,
+        'zoom': zoom,
+        'num_images_left': num_images_left,
+        'next_image_is_ready': next_image_is_ready
+    })
 
-    image_filepath = images_manager.get_current_image_filepath()
-    zoom = images_manager.get_current_zoom()
-    num_images_labeled = images_manager.get_num_images_labeled()
-
-    return jsonify([image_filepath, zoom, num_images_labeled])
+    return response
 
 
 if __name__ == '__main__':

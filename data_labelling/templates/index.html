@@ -3,7 +3,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
     <script>
-      let num_images_labeled = {{ num_images_labeled|tojson }},
+      let num_images_left = {{ num_images_left|tojson }},
           image_filepath = {{ image_filepath|tojson }},
           zoom = {{ zoom|tojson }};
     </script>
@@ -18,26 +18,29 @@
             <h5>Zoom:</h5> <h1 id="zoom-level">{{ zoom }}</h1>
           </div>
           <div class="number-container">
-            <h5>Images labeled:</h5> <h1 id="num-images-labeled">{{ num_images_labeled }}</h1>
+            <h5>Images left:</h5> <h1 id="num-images-left">{{ num_images_left }}</h1>
           </div>
         </div>
 
         <div class="button-container-wrapper noselect">
           <form method="POST">
             <div class="zoom-button-container">
-              <div id="zoom-out-button" class="button">
+              <div id="zoom-out-button" class="button zoom-button">
                 <h3>-</h3>
               </div>
-              <div id="zoom-in-button" class="button">
+              <div id="zoom-in-button" class="button zoom-button">
                 <h3>+</h3>
               </div>
             </div>
             <div class="classification-button-container">
-              <div id="no-button" class="button">
+              <div id="no-button" class="button label-button">
                 <h3>No</h3>
               </div>
-              <div id="yes-button" class="button">
+              <div id="yes-button" class="button label-button">
                 <h3>Yes</h3>
+              </div>
+              <div id="ignore-button" class="button label-button">
+                <h3>Ignore</h3>
               </div>
             </div>
           </form>
