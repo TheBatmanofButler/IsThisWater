@@ -1,26 +1,27 @@
 let updateZoom = function (newZoom) {
-      callImagesAPI('/update_zoom', newZoom, onUpdateZoomSuccess);
+      callImagesAPI('/update_zoom', newZoom, false);
     },
 
     loadNextImage = function (label) {
-      callImagesAPI('/load_next_image', label, onNextImageSuccess);
+      callImagesAPI('/load_next_image', label, true);
     },
 
-    onNextImageSuccess = function (response) {
+    serverCallback = function (response, prepForNextImage) {
+      if (prepForNextImage) {
+        num_images_left = response['num_images_left'];
+        next_image_is_ready = response['next_image_is_ready'];
+  
+        if (next_image_is_ready === false) {
+          $('.button')
+            .off('click')
+            .on('click', function () {
+              alert('All sites have been labeled.');
+            });
+        }
+      }
+
       image_filepath = response['image_filepath'];
       zoom = response['zoom'];
-      num_images_left = response['num_images_left'];
-      next_image_is_ready = response['next_image_is_ready']
-
-      if (!next_image_is_ready)
-        $('.button').off();
-      
-      updateUI();
-    },
-
-    onUpdateZoomSuccess = function (response) {
-      image_filepath = response[0];
-      zoom = response[1]
 
       updateUI();
     },
@@ -36,16 +37,23 @@ let updateZoom = function (newZoom) {
       $image.on('load', function () {
         $image.css('opacity', '1');
       });
-      console.log(222);
     }
     
-    callImagesAPI = function (url, data, successCallback) {
+    callImagesAPI = function (url, data, prepForNextImage) {
       $.ajax({
         url: url,
         data: JSON.stringify(data),
         type: 'POST',
         contentType: 'application/json',
-        success: successCallback
+        success: function (response) {
+          serverCallback(response, prepForNextImage);
+        },
+        error: function(xhr, status, error) {
+          let responseObj = JSON.parse(xhr.responseText),
+              errorMessage = responseObj.message;
+
+          alert(errorMessage);
+        },
       });
     };
 

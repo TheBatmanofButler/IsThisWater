@@ -28,7 +28,6 @@ def update_zoom():
     download_status_code = images_manager.update_image(zoom)
 
     if download_status_code == 200:
-
         image_filepath = images_manager.get_current_image_filepath()
         random_num = random.randint(1e6, 1e7 - 1)
         image_filepath_rand = '{}?dummy={}'.format(image_filepath,
