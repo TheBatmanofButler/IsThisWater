@@ -1,34 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Page Title</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src='https://api.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css' rel='stylesheet' />    
+  <script src='https://api.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css' rel='stylesheet' />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">        
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
 </head>
 <body>
-    <div>Latitude: </div>
-    <div id="lat"></div>
-    <div>Longitude: </div>
-    <div id="lng"></div>
-    <br>
-    <br>
-    <br>
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div class="coords-container">
+          <span class="bold">Latitude: </span>
+          <span id="lat"></span>
+          <br>
+          <span class="bold">Longitude: </span>
+          <span id="lng"></span>
+        </div>
 
-    <div id='map' style='width: 400px; height: 300px;'></div>
+        <div class="interactive-map-container">
+          <div id="map" style="width: 400px; height: 400px;"></div>
+          <button id="predict-button" type="button" class="btn btn-primary">Check for water</button>
+        </div>
 
-    <br>
-    <br>
-    <br>
-    <div id="result"></div>
+      </div>
 
-    <script src="{{ url_for('static', filename='global.js') }}"></script>
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+      <div class="col-sm">
+        <div id="result"></div>
+        <div class="static-map-container">
+          <img class="static-map" src="{{ url_for('static', filename='dummy.png') }}">
+        </div>
+      </div>
+    </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+  <script src="{{ url_for('static', filename='global.js') }}"></script>
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
 
 </body>
 </html>

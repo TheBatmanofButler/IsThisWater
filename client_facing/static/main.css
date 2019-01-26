@@ -1,0 +1,23 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.coords-container {
+  height: 20%;
+
+  font-size: 150%;
+}
+
+.static-map {
+  width: 400px;
+  height: 400px;
+}
+
+#result {
+  height: 20%;
+}
+
+.bold {
+  font-weight: bold;
+}
