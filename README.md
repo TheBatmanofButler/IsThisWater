@@ -7,7 +7,9 @@ One of the most important concerns with climate change is the increasing scarcit
 
 ## How to use
 1. Scroll/zoom to a location on the Earth using an interactive map from Mapbox.
-GIF
+
+![GIF of scroll/zoom](sample.gif)
+
 2. Click Detect Water.
 GIF
 3. The neural network will classify the image as "Water" or "No Water" and return the result. 
