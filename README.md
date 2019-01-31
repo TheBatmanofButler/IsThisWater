@@ -16,6 +16,13 @@ This project is a work in progress:
 - [ ] Perform data augmentation and train model on the images
 - [ ] Connect frontend with model prediction endpoint in backend
 
+
+## Installation
+
+1. Clone the repo.
+2. Run `pipenv install` inside the cloned repo.
+
+
 ## How to use the data labelling app
 
 1. Run [`get_site_data_from_cities.ipynb`](data_labelling/notebooks/get_site_data_from_cities.ipynb) to collect geographical coordinates for random sites located near [select U.S. cities](data_labelling/json/cities.json).
