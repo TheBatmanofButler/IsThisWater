@@ -24,13 +24,13 @@ This project is a work in progress:
 
 3. Run [`data_labelling/app.py`](data_labelling/app.py) with Python 3 to open the data labelling app at `localhost:5000`. The app will automatically load each image using an iterator in the backend.
 
-4. For each image, click either "No", "Yes", or "Ignore" to label the image.
+4. For each image, click either "No", "Yes", or "Ignore" to label the image. The image will be moved to the appropriate folder inside the [`static`](data_labelling/static) folder, and the next image will load.
 ![GIF of scroll/zoom](yes-no.gif)
 
-The image will be moved to the appropriate folder inside the [`static`](data_labelling/static) folder. To zoom in or out, use the corresponding buttons, and the base image (at zoom level 15) will be replaced by an image at the correct zoom level.
+5. To zoom in or out, use the corresponding buttons, and the base image (at zoom level 15) will be replaced by an image at the correct zoom level.
 ![GIF of scroll/zoom](zoom-in-out.gif)
 
-5. Close the app when all the images are labelled.
+6. Close the app when all the images are labelled.
 
 
 ## How to use the water detection app
