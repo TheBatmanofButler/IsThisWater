@@ -25,19 +25,20 @@ This project is a work in progress:
 3. Run [`data_labelling/app.py`](data_labelling/app.py) with Python 3 to open the data labelling app at `localhost:5000`. The app will automatically load each image using an iterator in the backend.
 
 4. For each image, click either "No", "Yes", or "Ignore" to label the image. The image will be moved to the appropriate folder inside the [`static`](data_labelling/static) folder, and the next image will load.
-![GIF of scroll/zoom](yes-no.gif)
+![GIF of scroll/zoom](gifs/yes-no.gif)
 
 5. To zoom in or out, use the corresponding buttons, and the base image (at zoom level 15) will be replaced by an image at the correct zoom level.
-![GIF of scroll/zoom](zoom-in-out.gif)
+![GIF of scroll/zoom](gifs/zoom-in-out.gif)
 
 6. Close the app when all the images are labelled.
 
 
 ## How to use the water detection app
+#### (This is just a skeleton for the frontend. It is in development and is not connected to the backend. The image classification result is generated randomly.)
 1. Scroll/zoom to a location on the Earth using an interactive map from Mapbox.
-
-![GIF of scroll/zoom](sample.gif)
+![GIF of scroll/zoom](gifs/scroll.gif)
 
 2. Click Detect Water.
-GIF
+![GIF of clicking the button](gifs/check-for-water.gif)
+
 3. The neural network will classify the image as "Water" or "No Water" and return the result. 
