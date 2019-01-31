@@ -6,6 +6,7 @@ import shutil
 
 from mapbox import Static
 
+
 MAPBOX_ACCESS_TOKEN = os.environ['MAPBOX_ACCESS_TOKEN']
 service = Static(access_token=MAPBOX_ACCESS_TOKEN)
 
