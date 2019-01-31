@@ -7,6 +7,15 @@ _IsThisWater_ is a web app that detects the existence of any surface water (rive
 
 One of the most important concerns with climate change is the increasing scarcity of freshwater sources. One of the ways that technology can be used to mitigate this problem is understanding where and how much water exists on the surface of the Earth. Convolutional neural networks have been used successfully in the past to identify and map surface water from Landsat images, as explained in studies like <a href="https://www.tandfonline.com/doi/pdf/10.1080/17538947.2015.1026420?needAccess=true&">this</a> and <a href="http://live.ece.utexas.edu/publications/2017/isikdogan2017surface.pdf">this</a>.
 
+This project is a work in progress:
+
+- [x] Create data labelling app
+- [x] Create water detection frontend
+- [ ] Label 2000-3000 images
+- [ ] Build convnet model
+- [ ] Perform data augmentation and train model on the images
+- [ ] Connect frontend with model prediction endpoint in backend
+
 ## How to use the data labelling app
 1. Run `get_site_data_from_cities.ipynb` to collect geographical coordinates for random sites located near select U.S. cities.
 2. Run `download_base_images.ipynb` to download satellite images from Mapbox at zoom level 15 for each of the sites. The images are saved locally at the location dictated by the `BASE_IMAGES_DIRECTORY` variable.
