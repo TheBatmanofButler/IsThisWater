@@ -17,11 +17,20 @@ This project is a work in progress:
 - [ ] Connect frontend with model prediction endpoint in backend
 
 ## How to use the data labelling app
+
 1. Run [`get_site_data_from_cities.ipynb`](data_labelling/notebooks/get_site_data_from_cities.ipynb) to collect geographical coordinates for random sites located near [select U.S. cities](data_labelling/json/cities.json).
+
 2. Run [`download_base_images.ipynb`](data_labelling/notebooks/download_base_images.ipynb) to download satellite images from Mapbox at zoom level 15 for each of the sites. The images are saved locally at the location dictated by the `BASE_IMAGES_DIRECTORY` variable.
+
 3. Run [`data_labelling/app.py`](data_labelling/app.py) with Python 3 to open the data labelling app at `localhost:5000`. The app will automatically load each image using an iterator in the backend.
-4. For each image, click either "No", "Yes", or "Ignore" to label the image. The image will be moved to the appropriate folder inside the [`static`](data_labelling/static) folder. To zoom in or out, use the corresponding buttons, and the base image (at zoom level 15) will be replaced by an image at the correct zoom level.
-5. The app will let you know when all the images are labelled.
+
+4. For each image, click either "No", "Yes", or "Ignore" to label the image.
+![GIF of scroll/zoom](yes-no.gif)
+
+The image will be moved to the appropriate folder inside the [`static`](data_labelling/static) folder. To zoom in or out, use the corresponding buttons, and the base image (at zoom level 15) will be replaced by an image at the correct zoom level.
+![GIF of scroll/zoom](zoom-in-out.gif)
+
+5. Close the app when all the images are labelled.
 
 
 ## How to use the water detection app
