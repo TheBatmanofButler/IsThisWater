@@ -9,6 +9,8 @@ verify_ssl = true
 ipykernel = "*"
 flask = "*"
 mapbox = "*"
+urllib3 = ">=1.24.2"
+Jinja2 = ">=2.10.1"
 
 [requires]
 python_version = "3.7"
