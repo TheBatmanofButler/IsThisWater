@@ -13,7 +13,7 @@ service = Static(access_token=MAPBOX_ACCESS_TOKEN)
 
 class ImagesManager:
 
-    def __init__(self, sites_data_filepath='json/sites_from_cities_0.json'):
+    def __init__(self, sites_data_filepath='json/sites.json'):
         self._STANDARD_ZOOM = 15
         self._STATIC_DIRECTORY = 'static/'
         self._BASE_IMAGES_DIRECTORY = 'base_images/'
