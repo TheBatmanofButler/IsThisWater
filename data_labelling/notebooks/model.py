@@ -3,7 +3,7 @@
 
 # ## Source: https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html
 
-# In[2]:
+# In[1]:
 
 
 from keras.preprocessing.image import ImageDataGenerator
@@ -18,7 +18,7 @@ import random
 import shutil
 
 
-# In[3]:
+# In[2]:
 
 
 LABELED_IMAGES_DIRECTORY = '../static/labeled_images/'
@@ -29,6 +29,22 @@ NO_WATER_DIRECTORY = os.path.join(LABELED_IMAGES_DIRECTORY, 'no_water')
 TRAIN_IMAGES_DIRECTORY = '../model_data/train'
 VAL_IMAGES_DIRECTORY = '../model_data/val'
 TEST_IMAGES_DIRECTORY = '../model_data/test/test_images'
+
+total_num_water_images = len([name for name in os.listdir(WATER_DIRECTORY)])
+total_num_no_water_images = len([name for name in os.listdir(NO_WATER_DIRECTORY)])
+
+print(total_num_water_images, 'total images of water')
+print(total_num_no_water_images, 'total images of no water')
+
+
+# In[3]:
+
+
+num_water_samples = total_num_water_images - total_num_water_images  % 40
+num_no_water_samples = total_num_no_water_images - total_num_no_water_images % 40
+
+print(num_water_samples, 'images of water used')
+print(num_no_water_samples, 'images of no water used')
 
 
 # In[4]:
@@ -48,13 +64,36 @@ else:
 # In[5]:
 
 
-def copy_image_subset(target_directory, file_indices, label):
+def copy_image_subset(filenames, target_directory, file_indices, label):
     for ind in file_indices:
         filename = filenames[ind]
         current_filepath = os.path.join(LABELED_IMAGES_DIRECTORY, label, filename)        
         target_filepath = os.path.join(target_directory, label, filename)
 
         shutil.copyfile(current_filepath, target_filepath)
+
+
+# In[6]:
+
+
+def move_images_to_model_dirs(directory, label, num_samples):
+    
+    global total_train_samples
+    global total_val_samples
+    
+    filenames = os.listdir(directory)[:num_samples]
+    all_file_indices = list(range(num_samples))
+    random.shuffle(all_file_indices)
+
+    num_train_samples = math.floor(num_samples * 0.5)
+    train_sample_indices = all_file_indices[:num_train_samples]
+    val_sample_indices = all_file_indices[num_train_samples:]
+
+    total_train_samples += len(train_sample_indices)
+    total_val_samples += len(val_sample_indices)
+
+    copy_image_subset(filenames, TRAIN_IMAGES_DIRECTORY, train_sample_indices, label)
+    copy_image_subset(filenames, VAL_IMAGES_DIRECTORY, val_sample_indices, label)
 
 
 # In[7]:
@@ -66,27 +105,14 @@ labeled_directories = [(WATER_DIRECTORY, 'water'),
 total_train_samples = 0
 total_val_samples = 0
 
-for directory, label in labeled_directories:
-    filenames = os.listdir(directory)
-    num_files = len(filenames)
-    all_file_indices = list(range(num_files))
-    random.shuffle(all_file_indices)
-
-    num_train_samples = math.floor(num_files * 0.7)
-    train_sample_indices = all_file_indices[:num_train_samples]
-    val_sample_indices = all_file_indices[num_train_samples:]
-    
-    total_train_samples += len(train_sample_indices)
-    total_val_samples += len(val_sample_indices)
-
-    copy_image_subset(TRAIN_IMAGES_DIRECTORY, train_sample_indices, label)
-    copy_image_subset(VAL_IMAGES_DIRECTORY, val_sample_indices, label)
+move_images_to_model_dirs(WATER_DIRECTORY, 'water', num_water_samples)
+move_images_to_model_dirs(NO_WATER_DIRECTORY, 'no_water', num_no_water_samples)
 
 print('Total images for training:', total_train_samples)
 print('Total images for validation:', total_val_samples)
 
 
-# In[6]:
+# In[8]:
 
 
 model = Sequential()
@@ -114,7 +140,7 @@ model.compile(loss='binary_crossentropy',
               metrics=['accuracy'])
 
 
-# In[7]:
+# In[9]:
 
 
 # this is the augmentation configuration we will use for training
@@ -141,7 +167,7 @@ val_generator = test_datagen.flow_from_directory(
     class_mode='binary')
 
 
-# In[1]:
+# In[ ]:
 
 
 model.fit_generator(
@@ -157,5 +183,5 @@ model.save_weights('weights.h5')
 # In[ ]:
 
 
-model.evaluate_generator(generator=test_generator)
+# model.evaluate_generator(generator=test_generator)
 
